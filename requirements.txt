@@ -1,0 +1,9 @@
+# Core dependencies
+langchain-openai>=0.0.5
+openai>=1.0.0
+
+# Alibaba Cloud SDK (optional, for OSS storage)
+oss2>=2.18.0
+
+# Utilities
+python-dotenv>=1.0.0

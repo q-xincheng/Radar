@@ -1,8 +1,21 @@
 # config.py
 import os
+from dotenv import load_dotenv
 
-DATA_DIR = "data"
-DEFAULT_KEYWORD = "半导体"
+# Load environment variables from .env file (for local development)
+load_dotenv()
+
+# Basic Configuration
+DATA_DIR = os.getenv("DATA_DIR", "data")
+HISTORY_DIR = os.path.join(DATA_DIR, "History")
+DEFAULT_KEYWORD = os.getenv("DEFAULT_KEYWORD", "半导体")
+
+# OSS Configuration (Optional, for cloud storage)
+OSS_ACCESS_KEY_ID = os.getenv("OSS_ACCESS_KEY_ID", "")
+OSS_ACCESS_KEY_SECRET = os.getenv("OSS_ACCESS_KEY_SECRET", "")
+OSS_ENDPOINT = os.getenv("OSS_ENDPOINT", "")
+OSS_BUCKET_NAME = os.getenv("OSS_BUCKET_NAME", "")
+OSS_PREFIX = os.getenv("OSS_PREFIX", "radar/")
 
 # --- LLM 运行配置 ---
 LLM_MODEL = "deepseek-ai/DeepSeek-V3"
