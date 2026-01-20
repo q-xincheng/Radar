@@ -16,6 +16,8 @@ from typing import Any, Dict
 # 注意：在 FC 部署时，需要将整个项目代码上传，或者通过层（Layer）方式引入
 project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, project_root)
+codes_dir = os.path.join(project_root, 'codes')
+sys.path.insert(0, codes_dir)
 
 from codes.orchestrator import run_pipeline
 from codes.config import DEFAULT_KEYWORD
