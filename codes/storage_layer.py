@@ -91,11 +91,21 @@ class StorageClient:
         timestamp = now_ts()
         snapshot = ReportSnapshot(keyword=keyword, collected_at=timestamp, items=items)
         
+        # 序列化一次，多次使用
+        snapshot_dict = self._snapshot_to_dict(snapshot)
+        snapshot_json = json.dumps(snapshot_dict, ensure_ascii=False, indent=2)
+        
         # 保存到 latest_fetch.json
-        self.save_fetch_data(keyword, items)
+        latest_fetch_path = os.path.join(self.base_dir, "latest_fetch.json")
+        with open(latest_fetch_path, "w", encoding="utf-8") as f:
+            f.write(snapshot_json)
+        logger.info(f"Saved fetch data to {latest_fetch_path}")
         
         # 保存到 current_report.json
-        self.save_current_report(keyword, items)
+        current_report_path = os.path.join(self.base_dir, "current_report.json")
+        with open(current_report_path, "w", encoding="utf-8") as f:
+            f.write(snapshot_json)
+        logger.info(f"Saved current report to {current_report_path}")
         
         # 归档到 history/{timestamp}/
         history_path = os.path.join(self.history_dir, timestamp)
@@ -104,12 +114,12 @@ class StorageClient:
         # 保存 fetch.json
         fetch_file = os.path.join(history_path, "fetch.json")
         with open(fetch_file, "w", encoding="utf-8") as f:
-            json.dump(self._snapshot_to_dict(snapshot), f, ensure_ascii=False, indent=2)
+            f.write(snapshot_json)
         
         # 保存 report.json（与 fetch.json 相同，为未来扩展预留）
         report_file = os.path.join(history_path, "report.json")
         with open(report_file, "w", encoding="utf-8") as f:
-            json.dump(self._snapshot_to_dict(snapshot), f, ensure_ascii=False, indent=2)
+            f.write(snapshot_json)
         
         logger.info(f"Archived snapshot to {history_path}")
         return history_path

@@ -10,7 +10,9 @@
 files/role_a/
 ├── fc_handler.py          # FC 入口函数
 ├── README.md              # 本文件，部署说明
-└── fc_config_example.yml  # FC 配置示例（待创建）
+├── s.yaml                 # Serverless Devs 配置文件
+├── .env.example           # 环境变量模板
+└── local_test.sh          # 本地测试脚本
 ```
 
 ## 环境变量配置

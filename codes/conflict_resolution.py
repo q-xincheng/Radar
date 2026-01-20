@@ -60,9 +60,10 @@ def resolve_conflicts(changes: List[ChangeItem]) -> List[ConflictDecision]:
         if len(items_sorted) == 1:
             reason = f"唯一来源: {chosen_source.value} (权重={chosen_weight})"
         else:
+            pending_str = ', '.join([s.value if hasattr(s, 'value') else str(s) for s in pending])
             reason = (
                 f"权重最高来源优先: {chosen_source.value} (权重={chosen_weight})。"
-                f"待核实来源: {', '.join([s.value for s in pending])}"
+                f"待核实来源: {pending_str}"
             )
         
         decisions.append(
