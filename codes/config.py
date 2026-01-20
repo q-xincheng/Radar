@@ -1,14 +1,23 @@
 # config.py
 import os
 
-DATA_DIR = "data"
-DEFAULT_KEYWORD = "半导体"
+# --- 存储配置（环境变量优先）---
+DATA_DIR = os.getenv("DATA_DIR", "data")
+DEFAULT_KEYWORD = os.getenv("DEFAULT_KEYWORD", "半导体")
 
-# --- LLM 运行配置 ---
-LLM_MODEL = "deepseek-ai/DeepSeek-V3"
-LLM_BASE_URL = "https://api.siliconflow.cn/v1"
-LLM_TEMPERATURE = 0.1
-LLM_MAX_RETRIES = 3
+# --- 阿里云 OSS 配置（仅在需要时使用）---
+OSS_ACCESS_KEY_ID = os.getenv("OSS_ACCESS_KEY_ID", "")
+OSS_ACCESS_KEY_SECRET = os.getenv("OSS_ACCESS_KEY_SECRET", "")
+OSS_ENDPOINT = os.getenv("OSS_ENDPOINT", "")
+OSS_BUCKET = os.getenv("OSS_BUCKET", "")
+OSS_PREFIX = os.getenv("OSS_PREFIX", "radar/")
+
+# --- LLM 运行配置（环境变量优先）---
+LLM_API_KEY = os.getenv("SILICONFLOW_API_KEY", "")
+LLM_MODEL = os.getenv("LLM_MODEL", "deepseek-ai/DeepSeek-V3")
+LLM_BASE_URL = os.getenv("LLM_BASE_URL", "https://api.siliconflow.cn/v1")
+LLM_TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", "0.1"))
+LLM_MAX_RETRIES = int(os.getenv("LLM_MAX_RETRIES", "3"))
 
 # --- 增强版全行业通用 Prompt ---
 # config.py
