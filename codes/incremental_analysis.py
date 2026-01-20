@@ -9,17 +9,26 @@ from config import (
     LLM_MODEL, LLM_BASE_URL, LLM_TEMPERATURE, LLM_MAX_RETRIES, LLM_API_KEY
 )
 
-# API 密钥配置
-if not LLM_API_KEY:
-    raise ValueError("LLM_API_KEY environment variable is required")
+# Lazy initialization of LLM client
+_llm = None
 
-llm = ChatOpenAI(
-    api_key=LLM_API_KEY,
-    base_url=LLM_BASE_URL,
-    model=LLM_MODEL,
-    max_retries=LLM_MAX_RETRIES,
-    temperature=LLM_TEMPERATURE
-)
+def _get_llm():
+    """Lazy initialization of LLM client"""
+    global _llm
+    if _llm is None:
+        # Re-read the API key at runtime to pick up environment changes
+        import os
+        api_key = os.getenv("SILICONFLOW_API_KEY", "")
+        if not api_key:
+            raise ValueError("SILICONFLOW_API_KEY environment variable is required")
+        _llm = ChatOpenAI(
+            api_key=api_key,
+            base_url=LLM_BASE_URL,
+            model=LLM_MODEL,
+            max_retries=LLM_MAX_RETRIES,
+            temperature=LLM_TEMPERATURE
+        )
+    return _llm
 
 
 def _clamp(value: float, low: float = 0.2, high: float = 0.95) -> float:
@@ -100,6 +109,7 @@ def incremental_compare(old_snapshot: Optional[ReportSnapshot], new_items: List[
     new_text = "\n".join([f"[{i.source.value}] {i.title}: {i.content}" for i in new_items])
 
     try:
+        llm = _get_llm()
         response = llm.invoke([
             ("system", SYSTEM_PROMPT),
             ("user", USER_PROMPT_TEMPLATE.format(old_text=old_text, new_text=new_text))
@@ -143,6 +153,7 @@ def generate_global_summary(keyword: str, decisions: List[ConflictDecision]) -> 
     {summary_context}"""
     
     try:
+        llm = _get_llm()
         response = llm.invoke([("user", prompt)])
         return response.content.strip()
     except Exception:

@@ -1,0 +1,7 @@
+# Industry Radar - Python Dependencies
+
+# LLM Integration
+langchain-openai>=0.0.5
+
+# Optional: For future OSS integration
+# oss2>=2.18.0
