@@ -11,18 +11,39 @@ services:
       description: 行研雷达函数
       runtime: python3.9
       handler: codes/trigger_layer.handler
-      memorySize: 128
-      timeout: 30
+      memorySize: 512
+      timeout: 300
+      environmentVariables:
+        # 必需：LLM API 密钥
+        SILICONFLOW_API_KEY: ${env(SILICONFLOW_API_KEY)}
+        # 可选：OSS 配置（如果使用云存储）
+        # OSS_ACCESS_KEY_ID: ${env(OSS_ACCESS_KEY_ID)}
+        # OSS_ACCESS_KEY_SECRET: ${env(OSS_ACCESS_KEY_SECRET)}
+        # OSS_ENDPOINT: ${env(OSS_ENDPOINT)}
+        # OSS_BUCKET_NAME: ${env(OSS_BUCKET_NAME)}
+        # OSS_PREFIX: ${env(OSS_PREFIX)}
+        # 应用配置
+        DEFAULT_KEYWORD: 半导体
+        DATA_DIR: /tmp/data
     triggers:
       - name: timer-trigger
         type: timer
         config:
-          cronExpression: '0 0 */6 * * *'
+          # 每24小时触发一次（每天凌晨0点）
+          cronExpression: '0 0 0 * * *'
           payload: '{"keyword": "半导体"}'
+          enable: true
 
 # 使用说明：
-# 1. 安装 Serverless Devs CLI (s)
-# 2. 将本目录作为部署包，在命令行运行：
-#    s deploy
-# 3. 在控制台或 s.yaml 中配置环境变量：SILICONFLOW_API_KEY、OSS 相关凭据
-# 备注：如果你的团队使用不同的 region 或 runtime，请修改 above fields。
+# 1. 安装 Serverless Devs CLI: npm install -g @serverless-devs/s
+# 2. 配置阿里云凭据: s config add
+# 3. 设置环境变量: export SILICONFLOW_API_KEY=your_key_here
+# 4. 部署函数: s deploy
+# 5. 查看日志: s logs -t
+# 
+# 备注：
+# - cronExpression 格式: 秒 分 时 日 月 周
+# - '0 0 0 * * *' 表示每天凌晨0点触发
+# - memorySize 和 timeout 已调整以适应 LLM 调用需求
+# - /tmp/data 是 FC 函数的临时存储目录
+
