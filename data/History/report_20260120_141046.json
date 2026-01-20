@@ -3,18 +3,11 @@
   "collected_at": "20260120_141046",
   "items": [
     {
-      "title": "半导体行业预测更新",
-      "content": "半导体行业增速预测从 5% 调整到 8%",
-      "source": "official",
-      "url": "https://example.com/official",
-      "published_at": "2026-01-20"
-    },
-    {
-      "title": "权威媒体报道",
-      "content": "产能利用率从 80% 提升到 92%",
+      "title": "最新市场动态",
+      "content": "市场规模预计增长",
       "source": "media",
-      "url": "https://example.com/media",
-      "published_at": "2026-01-20"
+      "url": null,
+      "published_at": null
     }
   ]
 }
