@@ -50,14 +50,11 @@ pip install -r requirements.txt
    - 安装 python-dotenv 并在脚本开头 `from dotenv import load_dotenv; load_dotenv()`；  
    - 或在终端导出：`export SILICONFLOW_API_KEY=...`。
 
-3. **安装依赖**  
-   - `pip install -r requirements.txt`
-
-4. **运行调试链路（纯本地模拟，不依赖外部 API）**  
+3. **运行调试链路（纯本地模拟，不依赖外部 API）**  
    - `python codes/mock_test_b.py`  
    该脚本会：模拟旧快照 -> 生成新资讯 -> 增量对比 -> 冲突仲裁 -> 生成总决策，并在控制台打印结果。
 
-5. **运行真实管线（需要有效 API Key）**  
+4. **运行真实管线（需要有效 API Key）**  
    ```python
    from codes.orchestrator import run_pipeline
    result = run_pipeline(keyword="半导体")
