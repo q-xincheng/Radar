@@ -171,7 +171,9 @@ def test_database_client():
         )
         
         states = db.get_latest_states(keyword="半导体")
-        capacity_state = [s for s in states if s['field_name'] == "产能利用率"][0]
+        capacity_states = [s for s in states if s['field_name'] == "产能利用率"]
+        assert len(capacity_states) > 0, "Should find capacity state"
+        capacity_state = capacity_states[0]
         assert capacity_state['final_value'] == "95%", "Should update to new value"
         print(f"   ✓ Indicator updated: 产能利用率 = {capacity_state['final_value']}")
         
