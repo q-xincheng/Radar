@@ -1,14 +1,14 @@
 # config.py
 import os
 
-DATA_DIR = "data"
+DATA_DIR = os.getenv("DATA_DIR", "data")
 DEFAULT_KEYWORD = "半导体"
 
 # --- LLM 运行配置 ---
-LLM_MODEL = "deepseek-ai/DeepSeek-V3"
-LLM_BASE_URL = "https://api.siliconflow.cn/v1"
+LLM_MODEL = os.getenv("LLM_MODEL", "deepseek-ai/DeepSeek-V3")
+LLM_BASE_URL = os.getenv("LLM_BASE_URL", "https://api.siliconflow.cn/v1")
 LLM_TEMPERATURE = 0.1
-LLM_MAX_RETRIES = 3
+LLM_MAX_RETRIES = int(os.getenv("LLM_MAX_RETRIES", "3"))
 
 # --- 增强版全行业通用 Prompt ---
 # config.py

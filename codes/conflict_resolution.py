@@ -2,6 +2,13 @@ from __future__ import annotations
 from typing import Dict, List
 from models import ChangeItem, ConflictDecision, SOURCE_WEIGHTS, SourceType
 
+# 硬编码来源标签权重表（Decision 模块）
+SOURCE_TAGS = [
+    (SourceType.OFFICIAL, "官方公告/监管文件"),
+    (SourceType.MEDIA, "权威媒体/研究机构"),
+    (SourceType.RUMOR, "传闻/社交媒体"),
+]
+
 def resolve_conflicts(changes: List[ChangeItem]) -> List[ConflictDecision]:
     """冲突仲裁逻辑：按权重选择结论，并将 AI 洞察包装为通俗建议"""
     if not changes:
