@@ -47,14 +47,14 @@ pip install -r requirements.txt
    - 可选：`DATA_DIR` 自定义数据目录。
 
 2. **加载环境变量**（二选一）  
-   - 本仓库示例脚本未自动加载 `.env`，若你编写自定义脚本，可在脚本开头加入 `from dotenv import load_dotenv; load_dotenv()`；  
-   - 或在终端导出：`export SILICONFLOW_API_KEY=...`。
+   - 推荐：在终端导出：`export SILICONFLOW_API_KEY=...`（最简单、无需额外依赖）；  
+   - 如需 `.env` 自动加载，可手动安装 `python -m pip install python-dotenv`，然后在自定义脚本开头加入 `from dotenv import load_dotenv; load_dotenv()`（仓库默认未内置）。
 
 3. **运行调试链路（纯本地模拟，不依赖外部 API）**  
    - `python codes/mock_test_b.py`  
    该脚本会：模拟旧快照 -> 生成新资讯 -> 增量对比 -> 冲突仲裁 -> 生成总决策，并在控制台打印结果。
 
-4. **运行真实管线（需要有效 API Key，确保已加载环境变量且 Key 可用）**  
+4. **运行真实管线（需要有效 API Key，确保已加载环境变量且 Key 可用，否则会抛出缺少 API Key 的错误）**  
    ```python
    from codes.orchestrator import run_pipeline
    result = run_pipeline(keyword="半导体")
