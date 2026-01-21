@@ -13,6 +13,14 @@ services:
       handler: codes/trigger_layer.handler
       memorySize: 128
       timeout: 30
+      # 环境变量配置（可选）
+      # 敏感凭据建议在阿里云控制台配置，或使用 ${env(VAR_NAME)} 引用本地 .env 文件
+      # environmentVariables:
+      #   SILICONFLOW_API_KEY: ${env(SILICONFLOW_API_KEY)}  # 必需：AI API Key
+      #   LLM_MODEL: deepseek-ai/DeepSeek-V3                 # 可选：LLM 模型
+      #   LLM_BASE_URL: https://api.siliconflow.cn/v1        # 可选：LLM API 地址
+      #   LLM_MAX_RETRIES: "3"                               # 可选：重试次数
+      #   DATA_DIR: /tmp/data                                # 可选：数据目录
     triggers:
       - name: timer-trigger
         type: timer
@@ -20,9 +28,29 @@ services:
           cronExpression: '0 0 */6 * * *'
           payload: '{"keyword": "半导体"}'
 
-# 使用说明：
-# 1. 安装 Serverless Devs CLI (s)
-# 2. 将本目录作为部署包，在命令行运行：
+# ==============================================================================
+# Serverless Devs 部署说明
+# ==============================================================================
+# 
+# 1. 安装 Serverless Devs CLI：
+#    npm install -g @serverless-devs/s
+#
+# 2. 配置阿里云访问凭据（推荐使用 RAM 子账号）：
+#    s config add
+#
+# 3. 配置环境变量（三种方式任选其一）：
+#    方式 A：在上方 environmentVariables 中配置（适合非敏感配置）
+#    方式 B：在阿里云控制台配置（推荐用于 API Key 等敏感信息）
+#    方式 C：创建 .env 文件，通过 ${env(VAR)} 引用（适合本地开发）
+#
+# 4. 部署到阿里云：
 #    s deploy
-# 3. 在控制台或 s.yaml 中配置环境变量：SILICONFLOW_API_KEY、OSS 相关凭据
-# 备注：如果你的团队使用不同的 region 或 runtime，请修改 above fields。
+#
+# 5. 测试函数：
+#    s invoke -e '{"keyword": "半导体"}'
+#
+# 6. 查看日志：
+#    s logs -t
+#
+# 详细说明请参考 README.md 中的"云端部署"章节
+# ==============================================================================
