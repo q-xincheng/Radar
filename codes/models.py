@@ -37,41 +37,25 @@ class ReportSnapshot:
 
 @dataclass
 class ChangeItem:
-    field: str
+    """表示单个指标的变化项"""
+    field_name: str  # 使用 field_name 避免与 dataclass.field 命名冲突
     old: str
     new: str
     status: str
     source: SourceType
+    insight: str = ""  # 存储 AI 对变动的通俗化解读
     confidence: float = 0.0
 
 
 @dataclass
 class ConflictDecision:
-    field: str
+    """表示冲突仲裁的决策结果"""
+    field_name: str  # 使用 field_name 避免与 dataclass.field 命名冲突
     final_value: str
     chosen_source: SourceType
     pending_sources: List[SourceType] = field(default_factory=list)
-    reason: str = ""
+    reason: str = ""  # 存储最终采纳的 insight
 
 
 def now_ts() -> str:
     return datetime.utcnow().strftime("%Y%m%d_%H%M%S")
-
-# models.py
-@dataclass
-class ChangeItem:
-    field: str
-    old: str
-    new: str
-    status: str
-    source: SourceType
-    insight: str = ""  # 新增：存储 AI 对变动的通俗化解读
-    confidence: float = 0.0
-
-@dataclass
-class ConflictDecision:
-    field: str
-    final_value: str
-    chosen_source: SourceType
-    pending_sources: List[SourceType] = field(default_factory=list)
-    reason: str = ""  # 这里将存储最终采纳的 insight
