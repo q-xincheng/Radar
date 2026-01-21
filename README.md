@@ -37,7 +37,7 @@
 pip install -r requirements.txt
 ```
 
-### 1. 快速本地运行步骤（逐步）
+### 快速本地运行步骤（逐步）
 按下面的顺序即可在本地完整跑通任务：
 
 1. **准备环境变量**  
@@ -59,7 +59,7 @@ pip install -r requirements.txt
 
 5. **运行真实管线（需要有效 API Key）**  
    ```python
-   from orchestrator import run_pipeline
+   from codes.orchestrator import run_pipeline
    result = run_pipeline(keyword="半导体")
    print(result["global_summary"])
    print(result["decisions"])
