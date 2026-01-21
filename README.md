@@ -28,14 +28,24 @@
 - `conflict_resolution.py`：冲突仲裁（按权重选择结论）
 - `orchestrator.py`：流程编排（采集→对比→仲裁→存储）
 
-## 快速开始（本地示例）
+## 本地运行（角色 A 完成后）
+1. 预设环境变量（避免硬编码敏感信息）
+```bash
+export SILICONFLOW_API_KEY="your_api_key"
+export DATA_DIR="data"                    # 可选，自定义存储根目录
+export LLM_MODEL="deepseek-ai/DeepSeek-V3" # 可选
+export LLM_BASE_URL="https://api.siliconflow.cn/v1" # 可选
+export LLM_MAX_RETRIES=3                  # 可选
+```
+2. 运行示例管线
 ```python
 from orchestrator import run_pipeline
 
 result = run_pipeline(keyword="半导体")
-print(result["changes"])
-print(result["conflicts"])
+print(result["global_summary"])
+print(result["decisions"])
 ```
+3. 存储层会在 `data/` 下保留最新快照，并在 `data/history/` 中保留历史镜像，供增量对比使用（History/current_report.json 与 Latest_fetch.json 可从这里取得）。 
 
 ## 逐步完善清单
 详见 [逐步完善清单.md](0_逐步完善清单.md)
