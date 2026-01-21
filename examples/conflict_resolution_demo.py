@@ -7,7 +7,13 @@
 """
 
 import sys
-sys.path.insert(0, '/home/runner/work/Radar/Radar/codes')
+import os
+
+# 获取当前脚本所在目录的父目录，然后添加 codes 目录到路径
+script_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(script_dir)
+codes_dir = os.path.join(project_root, 'codes')
+sys.path.insert(0, codes_dir)
 
 from models import ChangeItem, SourceType, SOURCE_WEIGHTS
 from conflict_resolution import resolve_conflicts
