@@ -1,0 +1,80 @@
+# -*- coding: utf-8 -*-
+import logging
+import os
+import oss2
+
+# 初始化日志
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+
+def handler(event, context):
+    try:
+        bucket_name = os.getenv("OSS_BUCKET", "").strip()
+        if not bucket_name:
+            raise RuntimeError("Missing env OSS_BUCKET (e.g. radar-test).")
+
+        # 读取OSS_ENDPOINT，无则按region兜底
+        endpoint = os.getenv("OSS_ENDPOINT", "").strip()
+        if not endpoint:
+            region = getattr(context, "region", "cn-shanghai")
+            endpoint = f"https://oss-{region}.aliyuncs.com"
+            logger.warning("OSS_ENDPOINT not set, fallback to region-based endpoint: %s", endpoint)
+
+        # 读取OSS_PREFIX，处理路径格式
+        prefix = os.getenv("OSS_PREFIX", "radar/").lstrip("/")
+        key = f"{prefix}fc_oss_smoketest.txt"
+
+        #验证并获取RAM角色临时凭证（STS）
+        creds = getattr(context, "credentials", None)
+        if not creds:
+            raise RuntimeError(
+                "Missing context.credentials; "
+                "please configure FC service role (RAM) with OSS permission."
+            )
+
+        # 创建STS认证对象
+        auth = oss2.StsAuth(
+            creds.access_key_id,
+            creds.access_key_secret,
+            creds.security_token
+        )
+
+        # 输出关键信息，便于排查
+        logger.info(
+            "OSS configuration: endpoint=%s, bucket=%s, key=%s",
+            endpoint, bucket_name, key
+        )
+
+        # 3) OSS写入+读取验证
+        bucket = oss2.Bucket(auth, endpoint, bucket_name)
+
+        # 写入测试内容
+        test_content = "Hello OSS from FC (public endpoint, RAM role)\n"
+        bucket.put_object(key, test_content)
+        logger.info("Successfully wrote content to OSS key: %s", key)
+
+        # 读取并解码内容
+        object_stream = bucket.get_object(key)
+        content = object_stream.read().decode("utf-8", errors="replace")
+        logger.info("Read back content from OSS: %s", content.strip())
+
+        # 返回标准化成功响应
+        return {
+            "ok": True,
+            "bucket": bucket_name,
+            "endpoint": endpoint,
+            "key": key,
+            "content": content.strip()
+        }
+
+    except Exception as e:
+        # 捕获所有异常，输出详细日志便于排查
+        logger.error("Function execution failed: %s", str(e), exc_info=True)
+        # 返回标准化错误响应
+        return {
+            "ok": False,
+            "error": str(e),
+            "bucket": bucket_name if 'bucket_name' in locals() else None,
+            "endpoint": endpoint if 'endpoint' in locals() else None
+        }
