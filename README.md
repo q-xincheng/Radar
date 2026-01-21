@@ -47,7 +47,7 @@ pip install -r requirements.txt
    - 可选：`DATA_DIR` 自定义数据目录。
 
 2. **加载环境变量**（二选一）  
-   - 安装 python-dotenv 并在脚本开头 `from dotenv import load_dotenv; load_dotenv()`；  
+   - 若脚本未内置自动加载，安装 python-dotenv 并在脚本开头 `from dotenv import load_dotenv; load_dotenv()`；  
    - 或在终端导出：`export SILICONFLOW_API_KEY=...`。
 
 3. **运行调试链路（纯本地模拟，不依赖外部 API）**  
@@ -56,6 +56,7 @@ pip install -r requirements.txt
 
 4. **运行真实管线（需要有效 API Key）**  
    ```python
+   # 请先确保已按上一步加载好环境变量
    from codes.orchestrator import run_pipeline
    result = run_pipeline(keyword="半导体")
    print(result["global_summary"])
