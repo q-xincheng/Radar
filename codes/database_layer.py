@@ -3,11 +3,10 @@ from __future__ import annotations
 
 import os
 import sqlite3
-from datetime import datetime
 from typing import List, Optional
 
 from config import DATA_DIR
-from models import ConflictDecision, SourceType
+from models import ConflictDecision, SourceType, now_ts
 
 
 class DatabaseClient:
@@ -93,7 +92,7 @@ class DatabaseClient:
         if not decisions:
             return
         
-        now = datetime.utcnow().isoformat()
+        now = now_ts()  # Use consistent timestamp format from models.py
         
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()

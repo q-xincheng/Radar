@@ -82,20 +82,23 @@ class LocalStorageBackend(StorageBackend):
         }
     
     def _dict_to_snapshot(self, data: dict) -> ReportSnapshot:
-        items = [
-            NewsItem(
+        items = []
+        for i in data.get("items", []):
+            source_str = i.get("source", "media")
+            # Convert string to SourceType enum
+            try:
+                source = SourceType(source_str) if isinstance(source_str, str) else source_str
+            except ValueError:
+                source = SourceType.MEDIA  # Default to MEDIA if invalid
+            
+            items.append(NewsItem(
                 title=i.get("title", ""),
                 content=i.get("content", ""),
-                source=i.get("source", "media"),
+                source=source,
                 url=i.get("url"),
                 published_at=i.get("published_at"),
-            )
-            for i in data.get("items", [])
-        ]
-        # 兼容 source 字符串
-        for item in items:
-            if not hasattr(item.source, "value"):
-                item.source = item.source  # type: ignore[assignment]
+            ))
+        
         return ReportSnapshot(
             keyword=data.get("keyword", ""),
             collected_at=data.get("collected_at", ""),
@@ -208,7 +211,7 @@ class OSSStorageBackend(StorageBackend):
     
     def list_snapshots(self) -> List[str]:
         """列出所有 report_*.json 快照（不含前缀）"""
-        import oss2
+        import oss2  # Import oss2 locally to handle the case where it's not installed
         
         snapshots = []
         for obj in oss2.ObjectIterator(self.bucket, prefix=self.prefix):
@@ -237,16 +240,23 @@ class OSSStorageBackend(StorageBackend):
         }
     
     def _dict_to_snapshot(self, data: dict) -> ReportSnapshot:
-        items = [
-            NewsItem(
+        items = []
+        for i in data.get("items", []):
+            source_str = i.get("source", "media")
+            # Convert string to SourceType enum
+            try:
+                source = SourceType(source_str) if isinstance(source_str, str) else source_str
+            except ValueError:
+                source = SourceType.MEDIA  # Default to MEDIA if invalid
+            
+            items.append(NewsItem(
                 title=i.get("title", ""),
                 content=i.get("content", ""),
-                source=i.get("source", "media"),
+                source=source,
                 url=i.get("url"),
                 published_at=i.get("published_at"),
-            )
-            for i in data.get("items", [])
-        ]
+            ))
+        
         return ReportSnapshot(
             keyword=data.get("keyword", ""),
             collected_at=data.get("collected_at", ""),
