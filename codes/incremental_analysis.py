@@ -111,7 +111,7 @@ def incremental_compare(old_snapshot: Optional[ReportSnapshot], new_items: List[
         for c in raw_changes:
             confidence = _compute_dynamic_confidence(c, default_source, new_items)
             changes.append(ChangeItem(
-                field=str(c.get("field", "未知指标")),
+                field_name=str(c.get("field", "未知指标")),
                 old=str(c.get("old", "N/A")),
                 new=str(c.get("new", "N/A")),
                 status=str(c.get("status", "changed")),
@@ -131,7 +131,7 @@ def generate_global_summary(keyword: str, decisions: List[ConflictDecision]) -> 
 
     # 汇总上下文供 AI 总结
     summary_context = "\n".join([
-        f"- {d.field}: 变为 {d.final_value}。专家分析: {d.reason}" 
+        f"- {d.field_name}: 变为 {d.final_value}。专家分析: {d.reason}" 
         for d in decisions
     ])
 

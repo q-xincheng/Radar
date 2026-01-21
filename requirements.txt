@@ -9,5 +9,8 @@ langchain-openai>=0.0.5
 # Optional: for loading .env files automatically
 python-dotenv>=1.0.0
 
+# OSS Storage Support (optional, only needed when STORAGE_BACKEND=oss)
+oss2>=2.18.0
+
 # Note: Standard library modules used (no additional deps needed):
-# - os, json, re, typing, datetime, enum, dataclasses
+# - os, json, re, typing, datetime, enum, dataclasses, sqlite3

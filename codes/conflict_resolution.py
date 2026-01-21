@@ -18,12 +18,12 @@ def resolve_conflicts(changes: List[ChangeItem]) -> List[ConflictDecision]:
     # 1. 按指标字段进行分组
     grouped: Dict[str, List[ChangeItem]] = {}
     for c in changes:
-        grouped.setdefault(c.field, []).append(c)
+        grouped.setdefault(c.field_name, []).append(c)
 
     decisions: List[ConflictDecision] = []
     
     # 2. 针对每个指标进行仲裁
-    for field, items in grouped.items():
+    for field_name, items in grouped.items():
         # 按预设的来源权重排序（官方 > 媒体 > 传闻）
         items_sorted = sorted(
             items,
@@ -39,7 +39,7 @@ def resolve_conflicts(changes: List[ChangeItem]) -> List[ConflictDecision]:
         
         decisions.append(
             ConflictDecision(
-                field=field,
+                field_name=field_name,
                 final_value=chosen.new,
                 chosen_source=chosen.source,
                 pending_sources=pending,

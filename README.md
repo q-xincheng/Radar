@@ -88,6 +88,17 @@ ALIBABA_CLOUD_ACCESS_KEY_SECRET="your_access_key_secret"
 # LLM_BASE_URL="https://api.siliconflow.cn/v1"
 # LLM_MAX_RETRIES=3
 # DATA_DIR="data"
+
+# 存储后端配置（可选）
+# STORAGE_BACKEND="local"  # 或 "oss" 使用阿里云 OSS
+
+# OSS 配置（当 STORAGE_BACKEND=oss 时需要）
+# OSS_ENDPOINT="oss-cn-hangzhou.aliyuncs.com"
+# OSS_BUCKET="your-bucket-name"
+# OSS_PREFIX="radar/"
+
+# SQLite 数据库路径（可选）
+# DB_PATH="data/radar.db"
 ```
 
 3. 安装 python-dotenv（如需自动加载 .env 文件）：
@@ -117,7 +128,51 @@ export DATA_DIR="data"                    # 自定义存储根目录
 export LLM_MODEL="deepseek-ai/DeepSeek-V3" # LLM 模型
 export LLM_BASE_URL="https://api.siliconflow.cn/v1" # LLM API 地址
 export LLM_MAX_RETRIES=3                  # LLM API 重试次数
+
+# 存储后端配置
+export STORAGE_BACKEND="local"            # 或 "oss" 使用阿里云 OSS
+
+# OSS 配置（当 STORAGE_BACKEND=oss 时需要）
+export OSS_ENDPOINT="oss-cn-hangzhou.aliyuncs.com"
+export OSS_BUCKET="your-bucket-name"
+export OSS_PREFIX="radar/"
+
+# SQLite 数据库路径
+export DB_PATH="data/radar.db"            # 本地持久化路径
 ```
+
+### 存储和数据库配置
+
+#### 存储后端
+
+系统支持两种存储后端（通过 `STORAGE_BACKEND` 环境变量切换）：
+
+1. **local（默认）**：本地文件存储
+   - 适用场景：本地开发和测试
+   - 数据保存在 `${DATA_DIR}` 目录下
+   - 无需额外配置
+
+2. **oss**：阿里云 OSS 对象存储
+   - 适用场景：生产环境、云函数部署
+   - **认证方式**：
+     - 优先使用 RAM 角色（适用于函数计算环境，无需配置 AK/SK）
+     - 兜底使用 AK/SK（本地调试时需配置 `ALIBABA_CLOUD_ACCESS_KEY_ID` 和 `ALIBABA_CLOUD_ACCESS_KEY_SECRET`）
+   - **必需环境变量**：
+     - `OSS_ENDPOINT`：OSS 访问域名（如 `oss-cn-hangzhou.aliyuncs.com`）
+     - `OSS_BUCKET`：OSS Bucket 名称
+   - **可选配置**：
+     - `OSS_PREFIX`：对象存储路径前缀（默认 `radar/`）
+
+#### SQLite 数据库
+
+系统使用 SQLite 持久化指标状态和决策历史：
+
+- **指标状态表（indicator_states）**：保存每个关键词+指标的最新状态
+- **决策历史表（conflict_decisions）**：保存每次运行的完整决策记录
+- **数据库路径**：通过 `DB_PATH` 环境变量配置（默认 `${DATA_DIR}/radar.db`）
+  - 本地开发：使用 `data/radar.db`
+  - 函数计算环境：建议使用 `/tmp/radar.db`（注意 `/tmp` 目录会在函数实例回收时清空）
+
 
 ### 2. 运行示例管线
 ```python

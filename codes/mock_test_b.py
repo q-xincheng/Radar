@@ -61,7 +61,7 @@ def run_debug_session():
 
     print("\n【📊 详细指标变动明细】")
     for d in decisions:
-        print(f"● 指标：{d.field}")
+        print(f"● 指标：{d.field_name}")
         print(f"  当前值：{d.final_value}")
         print(f"  分析建议：{d.reason}") # 这里的 reason 已经是 AI 生成的“人话”分析
         print("-" * 40)
