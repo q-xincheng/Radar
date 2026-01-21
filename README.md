@@ -12,11 +12,14 @@
 触发层入口： trigger_layer.py
 采集层： scraper_layer.py
 存储层： storage_layer.py
+存储门面： storage_lib.py          （稳定 API 接口）
 增量对比： incremental_analysis.py
 冲突仲裁： conflict_resolution.py
 流程编排： orchestrator.py
 数据模型与权重： models.py
 配置项： config.py
+日志配置： logging_setup.py         （统一日志配置）
+告警模块： alerting.py             （钉钉 + 邮件告警）
 逐步完善清单： 逐步完善清单.md
 ```
 
@@ -24,9 +27,12 @@
 - `trigger_layer.py`：Serverless 触发入口（Cron 触发器调用）
 - `scraper_layer.py`：采集层（抓取资讯）
 - `storage_layer.py`：存储层（快照写入/读取）
+- `storage_lib.py`：存储门面（稳定 API 接口，供团队调用）
 - `incremental_analysis.py`：增量对比（识别变化字段）
 - `conflict_resolution.py`：冲突仲裁（按权重选择结论）
-- `orchestrator.py`：流程编排（采集→对比→仲裁→存储）
+- `orchestrator.py`：流程编排（采集→对比→仲裁→存储，含数据保护）
+- `logging_setup.py`：统一日志配置（支持从环境变量读取日志级别）
+- `alerting.py`：告警模块（钉钉机器人 + QQ 邮箱通知）
 
 ## 本地运行
 
@@ -88,6 +94,7 @@ ALIBABA_CLOUD_ACCESS_KEY_SECRET="your_access_key_secret"
 # LLM_BASE_URL="https://api.siliconflow.cn/v1"
 # LLM_MAX_RETRIES=3
 # DATA_DIR="data"
+# LOG_LEVEL="INFO"  # 日志级别：DEBUG, INFO, WARNING, ERROR, CRITICAL
 
 # 存储后端配置（可选）
 # STORAGE_BACKEND="local"  # 或 "oss" 使用阿里云 OSS
@@ -96,6 +103,19 @@ ALIBABA_CLOUD_ACCESS_KEY_SECRET="your_access_key_secret"
 # OSS_ENDPOINT="oss-cn-hangzhou.aliyuncs.com"
 # OSS_BUCKET="your-bucket-name"
 # OSS_PREFIX="radar/"
+
+# 告警配置（可选，用于采集失败通知）
+# 钉钉机器人告警
+# DINGTALK_WEBHOOK_URL="https://oapi.dingtalk.com/robot/send?access_token=your_token"
+# DINGTALK_SECRET=""  # 可选，当前版本不使用加签
+
+# 邮件告警（QQ 邮箱）
+# SMTP_HOST="smtp.qq.com"
+# SMTP_PORT="465"  # 465 for SSL (推荐), 587 for STARTTLS
+# SMTP_USERNAME="your_email@qq.com"
+# SMTP_PASSWORD="your_qq_mail_authorization_code"  # QQ 邮箱授权码
+# SMTP_TO="recipient1@example.com,recipient2@example.com"  # 多个收件人用逗号分隔
+# SMTP_FROM="your_email@qq.com"  # 可选，默认使用 SMTP_USERNAME
 
 # SQLite 数据库路径（可选）
 # DB_PATH="data/radar.db"
@@ -139,7 +159,80 @@ export OSS_PREFIX="radar/"
 
 # SQLite 数据库路径
 export DB_PATH="data/radar.db"            # 本地持久化路径
+
+# 日志配置
+export LOG_LEVEL="INFO"                   # 日志级别
+
+# 告警配置（可选）
+export DINGTALK_WEBHOOK_URL="https://oapi.dingtalk.com/robot/send?access_token=your_token"
+export SMTP_HOST="smtp.qq.com"
+export SMTP_PORT="465"
+export SMTP_USERNAME="your_email@qq.com"
+export SMTP_PASSWORD="your_authorization_code"
+export SMTP_TO="recipient@example.com"
 ```
+
+### 告警配置
+
+系统支持采集失败时的实时告警通知，帮助及时发现和处理问题。
+
+#### 支持的告警渠道
+
+1. **钉钉机器人告警**
+   - 适用场景：团队协作、即时通知
+   - 配置方法：
+     ```bash
+     export DINGTALK_WEBHOOK_URL="https://oapi.dingtalk.com/robot/send?access_token=your_token"
+     ```
+   - 获取 webhook：在钉钉群中添加自定义机器人，复制 webhook URL
+   - 注意：当前版本不使用加签功能（`DINGTALK_SECRET` 参数保留但不使用）
+
+2. **QQ 邮箱告警**
+   - 适用场景：正式通知、记录存档
+   - 支持端口：
+     - **465（SSL）**：推荐使用，安全性更高
+     - **587（STARTTLS）**：备选方案
+   - 配置方法：
+     ```bash
+     export SMTP_HOST="smtp.qq.com"
+     export SMTP_PORT="465"                    # 或 587
+     export SMTP_USERNAME="your_email@qq.com"
+     export SMTP_PASSWORD="your_authorization_code"  # 使用授权码，非密码
+     export SMTP_TO="recipient1@example.com,recipient2@example.com"  # 多个收件人用逗号分隔
+     # export SMTP_FROM="your_email@qq.com"   # 可选，默认使用 SMTP_USERNAME
+     ```
+
+#### QQ 邮箱授权码获取步骤
+
+QQ 邮箱使用授权码代替密码进行第三方登录，获取步骤：
+
+1. 登录 [QQ 邮箱网页版](https://mail.qq.com/)
+2. 点击顶部 **设置** → **账户**
+3. 找到 **POP3/IMAP/SMTP/Exchange/CardDAV/CalDAV服务** 部分
+4. 开启 **POP3/SMTP服务** 或 **IMAP/SMTP服务**
+5. 按提示发送短信验证后，系统会显示 **授权码**
+6. 复制授权码并配置到 `SMTP_PASSWORD` 环境变量中
+
+注意事项：
+- 授权码是一串16位字符（如 `abcdefghijklmnop`），不是 QQ 密码
+- 授权码要妥善保管，不要泄露给他人
+- 如果忘记授权码，可以重新生成（旧授权码会失效）
+
+#### 告警触发条件
+
+系统会在以下情况自动发送告警：
+
+1. **采集失败**：`scraper.fetch()` 抛出异常
+2. **采集返回空数据**：为防止误覆盖旧快照，空数据视为失败
+3. **流程执行异常**：其他导致任务失败的异常情况
+
+告警消息会自动脱敏，不会泄露敏感信息（如 API Key、密码等）。
+
+#### 可靠性保护机制
+
+- **不覆盖旧数据**：采集失败或返回空数据时，不会保存新快照，避免误伤历史数据
+- **异常隔离**：告警模块异常不会影响主流程，确保系统稳定性
+- **自动重试**：LLM API 调用支持自动重试（通过 `LLM_MAX_RETRIES` 配置）
 
 ### 存储和数据库配置
 

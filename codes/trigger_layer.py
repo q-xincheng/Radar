@@ -7,6 +7,8 @@ from typing import Any, Dict
 
 from orchestrator import run_pipeline
 from config import DEFAULT_KEYWORD
+from logging_setup import setup_logging
+from alerting import notify_failure
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -18,6 +20,9 @@ def handler(event: Any, context: Any) -> Dict[str, Any]:
     event 可能是 bytes / str（来自触发器 payload），也可能已是 dict。
     keyword 获取优先级：event.keyword > env.DEFAULT_KEYWORD > config.DEFAULT_KEYWORD
     """
+    # 设置统一日志配置
+    setup_logging(context)
+    
     # Get default keyword when event has no keyword
     # Priority: env.DEFAULT_KEYWORD > config.DEFAULT_KEYWORD
     default_keyword = os.getenv("DEFAULT_KEYWORD", DEFAULT_KEYWORD)
@@ -60,6 +65,29 @@ def handler(event: Any, context: Any) -> Dict[str, Any]:
         }
     except Exception as e:
         logger.error(f"Pipeline execution failed: {e}", exc_info=True)
+        
+        # 构造告警上下文
+        from alerting import _sanitize_dict
+        alert_context = {
+            "keyword": keyword,
+            "error": str(e),
+            "error_type": type(e).__name__,
+        }
+        
+        # 尝试获取 run_id（如果在异常前已生成）
+        try:
+            from models import now_ts
+            alert_context["run_id"] = now_ts()
+        except Exception:
+            pass
+        
+        # 添加脱敏后的 event 信息
+        if evt:
+            alert_context["event"] = _sanitize_dict(evt if isinstance(evt, dict) else {})
+        
+        # 发送告警通知
+        notify_failure(alert_context)
+        
         return {
             "status": "error",
             "keyword": keyword,

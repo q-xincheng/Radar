@@ -1,4 +1,5 @@
 from __future__ import annotations
+import logging
 from typing import Dict, List, Any
 
 from scraper_layer import ScraperAgent
@@ -7,6 +8,9 @@ from database_layer import DatabaseClient
 from incremental_analysis import incremental_compare, generate_global_summary
 from conflict_resolution import resolve_conflicts
 from models import ChangeItem, ConflictDecision, now_ts
+from alerting import notify_failure
+
+logger = logging.getLogger(__name__)
 
 def run_pipeline(keyword: str) -> Dict[str, Any]:
     """主流程编排：采集 -> 增量对比 -> 冲突仲裁 -> 生成全局总结 -> 存储"""
@@ -17,8 +21,36 @@ def run_pipeline(keyword: str) -> Dict[str, Any]:
     # 生成本次运行的唯一标识
     run_id = now_ts()
 
-    # 1. 采集最新资讯
-    new_items = scraper.fetch(keyword=keyword)
+    # 1. 采集最新资讯（添加可靠性保护）
+    try:
+        new_items = scraper.fetch(keyword=keyword)
+    except Exception as e:
+        logger.error(f"Scraper fetch failed for keyword '{keyword}': {e}", exc_info=True)
+        # 发送告警
+        notify_failure({
+            "keyword": keyword,
+            "run_id": run_id,
+            "error": f"采集失败: {str(e)}",
+            "error_type": type(e).__name__,
+            "stage": "scraper.fetch"
+        })
+        # 向上抛出异常，不保存快照
+        raise
+    
+    # 检查是否返回空数据（视为失败）
+    if not new_items:
+        error_msg = f"采集返回空数据，拒绝覆盖旧快照（keyword: {keyword}）"
+        logger.warning(error_msg)
+        # 发送告警
+        notify_failure({
+            "keyword": keyword,
+            "run_id": run_id,
+            "error": error_msg,
+            "stage": "scraper.fetch",
+            "reason": "empty_data_protection"
+        })
+        # 抛出异常，不保存快照和数据库
+        raise RuntimeError(error_msg)
     
     # 2. 加载旧快照
     old_snapshot = storage.load_latest_snapshot()
