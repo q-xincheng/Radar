@@ -1,0 +1,5 @@
+{
+    "OSS_BUCKET": "radar-test",
+    "OSS_ENDPOINT": "https://oss-cn-shanghai.aliyuncs.com",
+    "OSS_PREFIX": "radar/"
+}
