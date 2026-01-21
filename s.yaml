@@ -54,8 +54,14 @@ services:
           LLM_MAX_RETRIES: "3"
           
           # Sensitive keys should be set via FC console or using ${env(VAR_NAME)} syntax
-          # Example: SILICONFLOW_API_KEY: ${env(SILICONFLOW_API_KEY)}
-          # DO NOT hardcode sensitive API keys here
+          # Required API keys (uncomment and configure via environment or FC console):
+          # SILICONFLOW_API_KEY: ${env(SILICONFLOW_API_KEY)}
+          # 
+          # Optional: If not using RAM role for OSS access, configure:
+          # ALIBABA_CLOUD_ACCESS_KEY_ID: ${env(ALIBABA_CLOUD_ACCESS_KEY_ID)}
+          # ALIBABA_CLOUD_ACCESS_KEY_SECRET: ${env(ALIBABA_CLOUD_ACCESS_KEY_SECRET)}
+          # 
+          # DO NOT hardcode sensitive API keys directly in this file
       triggers:
         - name: timer-trigger
           type: timer
