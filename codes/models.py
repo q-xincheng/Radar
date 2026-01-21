@@ -7,11 +7,13 @@ from typing import List, Optional
 
 
 class SourceType(str, Enum):
-    OFFICIAL = "official"
-    MEDIA = "media"
-    RUMOR = "rumor"
+    """数据来源类型枚举"""
+    OFFICIAL = "official"  # 官方公告
+    MEDIA = "media"       # 权威媒体
+    RUMOR = "rumor"       # 市场传闻
 
 
+# 来源权重配置（硬编码）：官方 1.0 > 媒体 0.7 > 传闻 0.3
 SOURCE_WEIGHTS = {
     SourceType.OFFICIAL: 1.0,
     SourceType.MEDIA: 0.7,
@@ -21,6 +23,7 @@ SOURCE_WEIGHTS = {
 
 @dataclass
 class NewsItem:
+    """新闻条目"""
     title: str
     content: str
     source: SourceType
@@ -30,6 +33,7 @@ class NewsItem:
 
 @dataclass
 class ReportSnapshot:
+    """报告快照"""
     keyword: str
     collected_at: str
     items: List[NewsItem] = field(default_factory=list)
@@ -37,41 +41,26 @@ class ReportSnapshot:
 
 @dataclass
 class ChangeItem:
+    """变更条目"""
     field: str
     old: str
     new: str
     status: str
     source: SourceType
+    insight: str = ""  # AI 对变动的通俗化解读
     confidence: float = 0.0
 
 
 @dataclass
 class ConflictDecision:
+    """冲突仲裁决策"""
     field: str
     final_value: str
     chosen_source: SourceType
-    pending_sources: List[SourceType] = field(default_factory=list)
-    reason: str = ""
+    pending_sources: List[SourceType] = field(default_factory=list)  # 待核实来源
+    reason: str = ""  # 最终采纳的 insight
 
 
 def now_ts() -> str:
+    """生成当前时间戳"""
     return datetime.utcnow().strftime("%Y%m%d_%H%M%S")
-
-# models.py
-@dataclass
-class ChangeItem:
-    field: str
-    old: str
-    new: str
-    status: str
-    source: SourceType
-    insight: str = ""  # 新增：存储 AI 对变动的通俗化解读
-    confidence: float = 0.0
-
-@dataclass
-class ConflictDecision:
-    field: str
-    final_value: str
-    chosen_source: SourceType
-    pending_sources: List[SourceType] = field(default_factory=list)
-    reason: str = ""  # 这里将存储最终采纳的 insight

@@ -1,9 +1,25 @@
 from __future__ import annotations
 from typing import Dict, List
+import logging
+
 from models import ChangeItem, ConflictDecision, SOURCE_WEIGHTS, SourceType
 
+logger = logging.getLogger(__name__)
+
+
 def resolve_conflicts(changes: List[ChangeItem]) -> List[ConflictDecision]:
-    """冲突仲裁逻辑：按权重选择结论，并将 AI 洞察包装为通俗建议"""
+    """冲突仲裁逻辑：按权重选择结论，并将低权重来源标记为"待核实"
+    
+    权重规则（硬编码）：
+    - 官方公告 (official): 1.0
+    - 权威媒体 (media): 0.7
+    - 市场传闻 (rumor): 0.3
+    
+    仲裁策略：
+    1. 按指标字段分组
+    2. 每组内按权重排序，选择权重最高的作为最终结论
+    3. 低权重来源记录为 pending_sources（待核实）
+    """
     if not changes:
         return []
 
@@ -26,8 +42,14 @@ def resolve_conflicts(changes: List[ChangeItem]) -> List[ConflictDecision]:
         # 选择权重最高的条目作为最终结论
         chosen = items_sorted[0]
         
-        # 记录被舍弃的低权重来源，供成员 C 进行“待核实”展示
+        # 记录被舍弃的低权重来源，供成员 C 进行"待核实"展示
         pending = [i.source for i in items_sorted[1:]]
+        
+        if pending:
+            logger.info(
+                f"Field '{field}': Chose {chosen.source.value} (weight={SOURCE_WEIGHTS[chosen.source]}), "
+                f"pending sources: {[s.value for s in pending]}"
+            )
         
         decisions.append(
             ConflictDecision(

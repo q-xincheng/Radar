@@ -1,14 +1,26 @@
 # config.py
 import os
 
-DATA_DIR = "data"
-DEFAULT_KEYWORD = "半导体"
+# --- 数据存储配置（支持环境变量） ---
+DATA_DIR = os.getenv("DATA_DIR", "data")
+HISTORY_DIR = os.getenv("HISTORY_DIR", "data/History")
+CURRENT_REPORT_FILE = "current_report.json"
+LATEST_FETCH_FILE = "Latest_fetch.json"
+DEFAULT_KEYWORD = os.getenv("DEFAULT_KEYWORD", "半导体")
 
-# --- LLM 运行配置 ---
-LLM_MODEL = "deepseek-ai/DeepSeek-V3"
-LLM_BASE_URL = "https://api.siliconflow.cn/v1"
-LLM_TEMPERATURE = 0.1
-LLM_MAX_RETRIES = 3
+# --- LLM 运行配置（支持环境变量） ---
+LLM_API_KEY = os.getenv("SILICONFLOW_API_KEY", "")
+LLM_MODEL = os.getenv("LLM_MODEL", "deepseek-ai/DeepSeek-V3")
+LLM_BASE_URL = os.getenv("LLM_BASE_URL", "https://api.siliconflow.cn/v1")
+LLM_TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", "0.1"))
+LLM_MAX_RETRIES = int(os.getenv("LLM_MAX_RETRIES", "3"))
+
+# --- OSS/S3 配置（可选，支持环境变量） ---
+OSS_ACCESS_KEY = os.getenv("OSS_ACCESS_KEY", "")
+OSS_ACCESS_SECRET = os.getenv("OSS_ACCESS_SECRET", "")
+OSS_ENDPOINT = os.getenv("OSS_ENDPOINT", "")
+OSS_BUCKET = os.getenv("OSS_BUCKET", "")
+OSS_PREFIX = os.getenv("OSS_PREFIX", "radar/")
 
 # --- 增强版全行业通用 Prompt ---
 # config.py
