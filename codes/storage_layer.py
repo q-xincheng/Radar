@@ -21,12 +21,13 @@ class StorageClient:
         snapshot = ReportSnapshot(keyword=keyword, collected_at=now_ts(), items=items)
         filename = f"report_{snapshot.collected_at}.json"
         path = os.path.join(self.base_dir, filename)
+        snapshot_dict = self._snapshot_to_dict(snapshot)
         with open(path, "w", encoding="utf-8") as f:
-            json.dump(self._snapshot_to_dict(snapshot), f, ensure_ascii=False, indent=2)
+            json.dump(snapshot_dict, f, ensure_ascii=False, indent=2)
         # also keep history copy for incremental diff inputs
         history_path = os.path.join(self.history_dir, filename)
         with open(history_path, "w", encoding="utf-8") as f:
-            json.dump(self._snapshot_to_dict(snapshot), f, ensure_ascii=False, indent=2)
+            json.dump(snapshot_dict, f, ensure_ascii=False, indent=2)
         return path
 
     def load_latest_snapshot(self) -> Optional[ReportSnapshot]:

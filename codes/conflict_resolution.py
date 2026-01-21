@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import Dict, List
 from models import ChangeItem, ConflictDecision, SOURCE_WEIGHTS, SourceType
 
-# 硬编码来源标签权重表（Decision 模块）
+# 固定来源标签映射（Decision 模块）
 SOURCE_TAGS = [
     (SourceType.OFFICIAL, "官方公告/监管文件"),
     (SourceType.MEDIA, "权威媒体/研究机构"),
