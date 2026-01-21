@@ -2,6 +2,14 @@ from __future__ import annotations
 from typing import Dict, List
 from models import ChangeItem, ConflictDecision, SOURCE_WEIGHTS, SourceType
 
+# 固定来源标签映射（Decision 模块）
+SOURCE_TAGS = [
+    (SourceType.OFFICIAL, "官方公告/监管文件"),
+    (SourceType.MEDIA, "权威媒体/研究机构"),
+    (SourceType.RUMOR, "传闻/社交媒体"),
+]
+_SOURCE_TAG_MAP = dict(SOURCE_TAGS)
+
 def resolve_conflicts(changes: List[ChangeItem]) -> List[ConflictDecision]:
     """冲突仲裁逻辑：按权重选择结论，并将 AI 洞察包装为通俗建议"""
     if not changes:
@@ -36,7 +44,7 @@ def resolve_conflicts(changes: List[ChangeItem]) -> List[ConflictDecision]:
                 chosen_source=chosen.source,
                 pending_sources=pending,
                 # 核心改进：理由不再是代码逻辑，而是 AI 生成的行业洞察
-                reason=chosen.insight 
+                reason=f"[{_SOURCE_TAG_MAP.get(chosen.source, chosen.source)}] {chosen.insight}"
             )
         )
         

@@ -14,13 +14,20 @@ class StorageClient:
     def __init__(self, base_dir: str = DATA_DIR) -> None:
         self.base_dir = base_dir
         os.makedirs(self.base_dir, exist_ok=True)
+        self.history_dir = os.path.join(self.base_dir, "history")
+        os.makedirs(self.history_dir, exist_ok=True)
 
     def save_snapshot(self, keyword: str, items: List[NewsItem]) -> str:
         snapshot = ReportSnapshot(keyword=keyword, collected_at=now_ts(), items=items)
         filename = f"report_{snapshot.collected_at}.json"
         path = os.path.join(self.base_dir, filename)
+        snapshot_dict = self._snapshot_to_dict(snapshot)
         with open(path, "w", encoding="utf-8") as f:
-            json.dump(self._snapshot_to_dict(snapshot), f, ensure_ascii=False, indent=2)
+            json.dump(snapshot_dict, f, ensure_ascii=False, indent=2)
+        # also keep history copy for incremental diff inputs
+        history_path = os.path.join(self.history_dir, filename)
+        with open(history_path, "w", encoding="utf-8") as f:
+            json.dump(snapshot_dict, f, ensure_ascii=False, indent=2)
         return path
 
     def load_latest_snapshot(self) -> Optional[ReportSnapshot]:

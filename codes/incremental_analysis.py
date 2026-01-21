@@ -9,8 +9,9 @@ from config import (
     LLM_MODEL, LLM_BASE_URL, LLM_TEMPERATURE, LLM_MAX_RETRIES
 )
 
-# API 密钥配置
-api_key = os.getenv("SILICONFLOW_API_KEY", "sk-zieigdeeconidojrwencrdvsejqfxaoqvbxeqbsrxmqinlna")
+api_key = os.getenv("SILICONFLOW_API_KEY")
+if not api_key:
+    raise RuntimeError("SILICONFLOW_API_KEY is required; set it as environment variable.")
 
 llm = ChatOpenAI(
     api_key=api_key,
