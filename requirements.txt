@@ -1,0 +1,13 @@
+# Industry Radar - Python Dependencies
+# =====================================
+# 
+# Install with: pip install -r requirements.txt
+
+# LLM Integration
+langchain-openai>=0.0.5
+
+# Optional: for loading .env files automatically
+python-dotenv>=1.0.0
+
+# Note: Standard library modules used (no additional deps needed):
+# - os, json, re, typing, datetime, enum, dataclasses

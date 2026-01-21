@@ -2,9 +2,10 @@ import os
 from models import NewsItem, SourceType, ReportSnapshot
 from incremental_analysis import incremental_compare, generate_global_summary
 from conflict_resolution import resolve_conflicts
+from config import validate_api_key
 
-# 配置 API Key
-os.environ["SILICONFLOW_API_KEY"] = "sk-zieigdeeconidojrwencrdvsejqfxaoqvbxeqbsrxmqinlna"
+# Validate API Key is set
+validate_api_key()
 
 def run_debug_session():
     print("=== [成员 B 调试模式] 纯模拟全链路逻辑测试 ===\n")
