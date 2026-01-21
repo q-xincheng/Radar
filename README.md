@@ -37,6 +37,35 @@
 pip install -r requirements.txt
 ```
 
+### 1. 快速本地运行步骤（逐步）
+按下面的顺序即可在本地完整跑通任务：
+
+1. **准备环境变量**  
+   - 复制模板：`cp .env.example .env`（如无模板，可直接创建 `.env`）。  
+   - 填入至少一项：`SILICONFLOW_API_KEY=your_actual_api_key_here`。  
+   - 如需阿里云能力，追加：`ALIBABA_CLOUD_ACCESS_KEY_ID`、`ALIBABA_CLOUD_ACCESS_KEY_SECRET`。  
+   - 可选：`DATA_DIR` 自定义数据目录。
+
+2. **加载环境变量**（二选一）  
+   - 安装 python-dotenv 并在脚本开头 `from dotenv import load_dotenv; load_dotenv()`；  
+   - 或在终端导出：`export SILICONFLOW_API_KEY=...`。
+
+3. **安装依赖**  
+   - `pip install -r requirements.txt`
+
+4. **运行调试链路（纯本地模拟，不依赖外部 API）**  
+   - `python codes/mock_test_b.py`  
+   该脚本会：模拟旧快照 -> 生成新资讯 -> 增量对比 -> 冲突仲裁 -> 生成总决策，并在控制台打印结果。
+
+5. **运行真实管线（需要有效 API Key）**  
+   ```python
+   from orchestrator import run_pipeline
+   result = run_pipeline(keyword="半导体")
+   print(result["global_summary"])
+   print(result["decisions"])
+   ```
+   首次运行会在 `data/` 下生成当前快照，并在后续运行时进行增量对比。
+
 ### 1. 环境配置
 
 **重要：** 所有敏感凭据必须通过环境变量配置，禁止硬编码到代码中。
