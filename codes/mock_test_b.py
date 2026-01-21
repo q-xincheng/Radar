@@ -2,16 +2,10 @@ import os
 from models import NewsItem, SourceType, ReportSnapshot
 from incremental_analysis import incremental_compare, generate_global_summary
 from conflict_resolution import resolve_conflicts
+from config import validate_api_key
 
 # Validate API Key is set
-if not os.getenv("SILICONFLOW_API_KEY"):
-    raise RuntimeError(
-        "SILICONFLOW_API_KEY is required. Please set it as an environment variable.\n"
-        "For Windows PowerShell:\n"
-        "  $env:SILICONFLOW_API_KEY=\"your_api_key_here\"\n"
-        "For Linux/Mac:\n"
-        "  export SILICONFLOW_API_KEY=\"your_api_key_here\""
-    )
+validate_api_key()
 
 def run_debug_session():
     print("=== [成员 B 调试模式] 纯模拟全链路逻辑测试 ===\n")

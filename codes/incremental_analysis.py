@@ -6,12 +6,11 @@ from langchain_openai import ChatOpenAI
 from models import ChangeItem, NewsItem, ReportSnapshot, SourceType, ConflictDecision, SOURCE_WEIGHTS
 from config import (
     SYSTEM_PROMPT, USER_PROMPT_TEMPLATE, 
-    LLM_MODEL, LLM_BASE_URL, LLM_TEMPERATURE, LLM_MAX_RETRIES
+    LLM_MODEL, LLM_BASE_URL, LLM_TEMPERATURE, LLM_MAX_RETRIES,
+    validate_api_key
 )
 
-api_key = os.getenv("SILICONFLOW_API_KEY")
-if not api_key:
-    raise RuntimeError("SILICONFLOW_API_KEY is required; set it as environment variable.")
+api_key = validate_api_key()
 
 llm = ChatOpenAI(
     api_key=api_key,

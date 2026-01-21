@@ -10,6 +10,23 @@ LLM_BASE_URL = os.getenv("LLM_BASE_URL", "https://api.siliconflow.cn/v1")
 LLM_TEMPERATURE = 0.1
 LLM_MAX_RETRIES = int(os.getenv("LLM_MAX_RETRIES", "3"))
 
+def validate_api_key():
+    """Validate that SILICONFLOW_API_KEY is set in environment.
+    
+    Raises:
+        RuntimeError: If SILICONFLOW_API_KEY is not set, with helpful setup instructions.
+    """
+    api_key = os.getenv("SILICONFLOW_API_KEY")
+    if not api_key:
+        raise RuntimeError(
+            "SILICONFLOW_API_KEY is required. Please set it as an environment variable.\n"
+            "For Windows PowerShell:\n"
+            "  $env:SILICONFLOW_API_KEY=\"your_api_key_here\"\n"
+            "For Linux/Mac:\n"
+            "  export SILICONFLOW_API_KEY=\"your_api_key_here\""
+        )
+    return api_key
+
 # --- 增强版全行业通用 Prompt ---
 # config.py
 SYSTEM_PROMPT = """你是一个专业的全行业分析助手。
