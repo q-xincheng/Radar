@@ -18,7 +18,8 @@ def handler(event: Any, context: Any) -> Dict[str, Any]:
     event 可能是 bytes / str（来自触发器 payload），也可能已是 dict。
     keyword 获取优先级：event.keyword > env.DEFAULT_KEYWORD > config.DEFAULT_KEYWORD
     """
-    # Get default keyword with priority: env.DEFAULT_KEYWORD > config.DEFAULT_KEYWORD
+    # Get default keyword when event has no keyword
+    # Priority: env.DEFAULT_KEYWORD > config.DEFAULT_KEYWORD
     default_keyword = os.getenv("DEFAULT_KEYWORD", DEFAULT_KEYWORD)
     keyword = default_keyword
 
