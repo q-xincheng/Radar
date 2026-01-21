@@ -1,0 +1,14 @@
+# 行研雷达 (Industry-Radar) 依赖包
+
+# LLM 集成
+langchain-openai>=0.0.1
+
+# 数据处理
+# (根据需要添加其他依赖)
+
+# 可选：阿里云 OSS SDK
+# oss2>=2.17.0
+
+# 可选：其他数据源
+# requests>=2.28.0
+# beautifulsoup4>=4.11.0

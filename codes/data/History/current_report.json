@@ -1,0 +1,13 @@
+{
+  "keyword": "测试",
+  "collected_at": "20260121_015527",
+  "items": [
+    {
+      "title": "集成测试新闻",
+      "content": "测试内容",
+      "source": "media",
+      "url": "https://test.com",
+      "published_at": "2026-01-21"
+    }
+  ]
+}
